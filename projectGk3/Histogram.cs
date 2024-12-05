@@ -44,7 +44,7 @@ namespace projectGk3
 
 
             }
-            for (int i = 1; i < 256; i++)
+            for (int i = 0; i < 256; i++)
             {
                 Pen pen = new Pen(Color.FromArgb(255, 0, 0));
                 Graphics g = Graphics.FromImage(result[0]);

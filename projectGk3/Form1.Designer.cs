@@ -33,8 +33,8 @@
             pictureBox3 = new PictureBox();
             pictureBox4 = new PictureBox();
             groupBox1 = new GroupBox();
+            label3 = new Label();
             buttonClean = new Button();
-            radioButtonPolygon = new RadioButton();
             trackBar1 = new TrackBar();
             radioButtonFullImage = new RadioButton();
             radioButtonBrush = new RadioButton();
@@ -93,6 +93,9 @@
             pictureBox1.TabStop = false;
             pictureBox1.Click += pictureBox1_Click;
             pictureBox1.Paint += pictureBox1_Paint;
+            pictureBox1.MouseDown += pictureBox1_MouseDown;
+            pictureBox1.MouseMove += pictureBox1_MouseMove;
+            pictureBox1.MouseUp += pictureBox1_MouseUp;
             // 
             // pictureBox2
             // 
@@ -120,8 +123,8 @@
             // 
             // groupBox1
             // 
+            groupBox1.Controls.Add(label3);
             groupBox1.Controls.Add(buttonClean);
-            groupBox1.Controls.Add(radioButtonPolygon);
             groupBox1.Controls.Add(trackBar1);
             groupBox1.Controls.Add(radioButtonFullImage);
             groupBox1.Controls.Add(radioButtonBrush);
@@ -131,6 +134,15 @@
             groupBox1.TabIndex = 6;
             groupBox1.TabStop = false;
             groupBox1.Text = "Obszar Zastosowania Filtra";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(165, 68);
+            label3.Name = "label3";
+            label3.Size = new Size(38, 15);
+            label3.TabIndex = 5;
+            label3.Text = "label3";
             // 
             // buttonClean
             // 
@@ -142,23 +154,16 @@
             buttonClean.UseVisualStyleBackColor = true;
             buttonClean.Click += buttonClean_Click;
             // 
-            // radioButtonPolygon
-            // 
-            radioButtonPolygon.AutoSize = true;
-            radioButtonPolygon.Location = new Point(6, 94);
-            radioButtonPolygon.Name = "radioButtonPolygon";
-            radioButtonPolygon.Size = new Size(71, 19);
-            radioButtonPolygon.TabIndex = 3;
-            radioButtonPolygon.TabStop = true;
-            radioButtonPolygon.Text = "Wielokąt";
-            radioButtonPolygon.UseVisualStyleBackColor = true;
-            // 
             // trackBar1
             // 
             trackBar1.Location = new Point(6, 68);
+            trackBar1.Maximum = 300;
+            trackBar1.Minimum = 1;
             trackBar1.Name = "trackBar1";
             trackBar1.Size = new Size(153, 45);
             trackBar1.TabIndex = 2;
+            trackBar1.Value = 1;
+            trackBar1.Scroll += trackBar1_Scroll;
             // 
             // radioButtonFullImage
             // 
@@ -181,6 +186,7 @@
             radioButtonBrush.TabStop = true;
             radioButtonBrush.Text = "Pędzel Kołowy";
             radioButtonBrush.UseVisualStyleBackColor = true;
+            radioButtonBrush.CheckedChanged += radioButtonBrush_CheckedChanged;
             // 
             // groupBoxFilter
             // 
@@ -244,88 +250,130 @@
             // 
             // numericUpDowndivisor
             // 
+            numericUpDowndivisor.DecimalPlaces = 5;
             numericUpDowndivisor.Enabled = false;
+            numericUpDowndivisor.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDowndivisor.Location = new Point(118, 297);
+            numericUpDowndivisor.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDowndivisor.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDowndivisor.Name = "numericUpDowndivisor";
             numericUpDowndivisor.Size = new Size(120, 23);
             numericUpDowndivisor.TabIndex = 17;
             // 
             // numericUpDownOffSet
             // 
-            numericUpDownOffSet.Enabled = false;
             numericUpDownOffSet.Location = new Point(116, 268);
+            numericUpDownOffSet.Maximum = new decimal(new int[] { 255, 0, 0, 0 });
+            numericUpDownOffSet.Minimum = new decimal(new int[] { 255, 0, 0, int.MinValue });
             numericUpDownOffSet.Name = "numericUpDownOffSet";
             numericUpDownOffSet.Size = new Size(120, 23);
             numericUpDownOffSet.TabIndex = 16;
             // 
             // numericUpDown33
             // 
+            numericUpDown33.DecimalPlaces = 5;
             numericUpDown33.Enabled = false;
+            numericUpDown33.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown33.Location = new Point(160, 230);
+            numericUpDown33.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown33.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown33.Name = "numericUpDown33";
             numericUpDown33.Size = new Size(78, 23);
             numericUpDown33.TabIndex = 15;
             // 
             // numericUpDown23
             // 
+            numericUpDown23.DecimalPlaces = 5;
             numericUpDown23.Enabled = false;
+            numericUpDown23.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown23.Location = new Point(160, 201);
+            numericUpDown23.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown23.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown23.Name = "numericUpDown23";
             numericUpDown23.Size = new Size(76, 23);
             numericUpDown23.TabIndex = 14;
             // 
             // numericUpDown32
             // 
+            numericUpDown32.DecimalPlaces = 5;
             numericUpDown32.Enabled = false;
+            numericUpDown32.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown32.Location = new Point(83, 230);
+            numericUpDown32.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown32.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown32.Name = "numericUpDown32";
             numericUpDown32.Size = new Size(71, 23);
             numericUpDown32.TabIndex = 13;
             // 
             // numericUpDown22
             // 
+            numericUpDown22.DecimalPlaces = 5;
             numericUpDown22.Enabled = false;
+            numericUpDown22.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown22.Location = new Point(83, 201);
+            numericUpDown22.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown22.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown22.Name = "numericUpDown22";
             numericUpDown22.Size = new Size(71, 23);
             numericUpDown22.TabIndex = 12;
+            numericUpDown22.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // numericUpDown31
             // 
+            numericUpDown31.DecimalPlaces = 5;
             numericUpDown31.Enabled = false;
+            numericUpDown31.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown31.Location = new Point(6, 230);
+            numericUpDown31.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown31.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown31.Name = "numericUpDown31";
             numericUpDown31.Size = new Size(71, 23);
             numericUpDown31.TabIndex = 11;
             // 
             // numericUpDown21
             // 
+            numericUpDown21.DecimalPlaces = 5;
             numericUpDown21.Enabled = false;
+            numericUpDown21.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown21.Location = new Point(6, 201);
+            numericUpDown21.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown21.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown21.Name = "numericUpDown21";
             numericUpDown21.Size = new Size(71, 23);
             numericUpDown21.TabIndex = 8;
             // 
             // numericUpDown13
             // 
+            numericUpDown13.DecimalPlaces = 5;
             numericUpDown13.Enabled = false;
+            numericUpDown13.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown13.Location = new Point(160, 172);
+            numericUpDown13.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown13.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown13.Name = "numericUpDown13";
             numericUpDown13.Size = new Size(76, 23);
             numericUpDown13.TabIndex = 10;
             // 
             // numericUpDown12
             // 
+            numericUpDown12.DecimalPlaces = 5;
             numericUpDown12.Enabled = false;
+            numericUpDown12.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown12.Location = new Point(83, 172);
+            numericUpDown12.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown12.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown12.Name = "numericUpDown12";
             numericUpDown12.Size = new Size(71, 23);
             numericUpDown12.TabIndex = 9;
             // 
             // numericUpDown11
             // 
+            numericUpDown11.DecimalPlaces = 5;
             numericUpDown11.Enabled = false;
+            numericUpDown11.Increment = new decimal(new int[] { 1, 0, 0, 65536 });
             numericUpDown11.Location = new Point(6, 172);
+            numericUpDown11.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            numericUpDown11.Minimum = new decimal(new int[] { 1000, 0, 0, int.MinValue });
             numericUpDown11.Name = "numericUpDown11";
             numericUpDown11.Size = new Size(71, 23);
             numericUpDown11.TabIndex = 8;
@@ -447,6 +495,7 @@
             Controls.Add(pictureBox2);
             Name = "Form1";
             Text = "Form1";
+            Load += Form1_Load_1;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox2).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
@@ -481,7 +530,6 @@
         private GroupBox groupBox1;
         private GroupBox groupBoxFilter;
         private Button buttonClean;
-        private RadioButton radioButtonPolygon;
         private TrackBar trackBar1;
         private RadioButton radioButtonFullImage;
         private RadioButton radioButtonBrush;
@@ -508,5 +556,6 @@
         private Button button1;
         private Button buttonPhotoLoad;
         private Panel panel2;
+        private Label label3;
     }
 }

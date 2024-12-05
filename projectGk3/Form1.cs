@@ -1,3 +1,5 @@
+using System.Windows.Forms;
+
 namespace projectGk3
 {
     public partial class Form1 : Form
@@ -7,11 +9,18 @@ namespace projectGk3
         public Bitmap HistogramR { get; set; }
         public Bitmap HistogramG { get; set; }
         public Bitmap HistogramB { get; set; }
+        float[,] Filter;
         public Form1()
         {
-            InitializeComponent();
-        }
 
+            InitializeComponent();
+            Filter = new float[,]
+               {
+            { (float)numericUpDown11.Value, (float)numericUpDown12.Value, (float)numericUpDown13.Value},
+            { (float)numericUpDown21.Value, (float)numericUpDown22.Value, (float)numericUpDown23.Value},
+            { (float)numericUpDown31.Value, (float)numericUpDown32.Value, (float)numericUpDown33.Value}
+               };
+        }
         private void groupBox2_Enter(object sender, EventArgs e)
         {
 
@@ -24,20 +33,32 @@ namespace projectGk3
 
         private void button1_Click(object sender, EventArgs e)
         {
-            float[,] Filter = new float[,]
+            if (radioButtonOwn.Checked)
             {
+                Filter = new float[,]
+                   {
             { (float)numericUpDown11.Value, (float)numericUpDown12.Value, (float)numericUpDown13.Value},
             { (float)numericUpDown21.Value, (float)numericUpDown22.Value, (float)numericUpDown23.Value},
             { (float)numericUpDown31.Value, (float)numericUpDown32.Value, (float)numericUpDown33.Value}
-            };
-            float OffSet = (float)numericUpDownOffSet.Value;
+                   };
+            }
             float divisor;
-            if (checkBoxAutoDivisor.Checked )
-                 divisor = 0;
+            if (checkBoxAutoDivisor.Checked)
+                divisor = 0;
             else
-                 divisor = (float)numericUpDowndivisor.Value;
-            float offSet = (float)numericUpDownOffSet.Value;   
-            PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, Filter, offSet, divisor);
+                divisor = (float)numericUpDowndivisor.Value;
+            float offSet = (float)numericUpDownOffSet.Value;
+            if (radioButtonFullImage.Checked)
+            {
+
+                PhotoAfter = ConvolutionFilter.ProcessUsingLockbits(PhotoAfter, Filter, offSet, divisor);
+                // PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(PhotoAfter, Filter, offSet, divisor);
+            }
+            else if (radioButtonBrush.Checked)
+            {
+
+                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilterCircle(PhotoAfter, Filter, offSet, divisor, mouseX, mouseY, trackBar1.Value / 2);
+            }
             pictureBox1.Image = PhotoAfter;
             CreateHistograms(PhotoAfter);
         }
@@ -59,8 +80,10 @@ namespace projectGk3
                     Photo = new Bitmap(openFileDialog.FileName, true);
                 }
             }
-            pictureBox1.Image = Photo;
-            CreateHistograms(Photo);
+            PhotoAfter =new Bitmap(Photo);
+            pictureBox1.Image = PhotoAfter;
+            brushColor = new bool[Photo.Width, Photo.Height];
+            CreateHistograms(PhotoAfter);
         }
         void CreateHistograms(Bitmap photo)
         {
@@ -92,39 +115,37 @@ namespace projectGk3
         {
 
         }
-
+        bool isStill = false;
         private void pictureBox1_Click(object sender, EventArgs e)
         {
-           
+            if (isStill) isStill = false;
+            else isStill = true;
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-
         }
 
         private void radioButtonBlurr_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonBlurr.Checked)
             {
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, ConvolutionFilter.BlurFilter, 0,-1);
-                pictureBox1.Image = PhotoAfter;
-                CreateHistograms(PhotoAfter);
+                Filter = ConvolutionFilter.BlurFilter;
             }
         }
 
         private void buttonClean_Click(object sender, EventArgs e)
         {
-            pictureBox1.Image = Photo;
+            PhotoAfter = new Bitmap(Photo);
+            pictureBox1.Image = PhotoAfter;
+            CreateHistograms(PhotoAfter);
         }
 
         private void radioButtonSharpen_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonSharpen.Checked)
             {
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, ConvolutionFilter.SharpenFilter, 0, -1);
-                pictureBox1.Image = PhotoAfter;
-                CreateHistograms(PhotoAfter);
+                Filter = ConvolutionFilter.SharpenFilter;
             }
         }
 
@@ -132,9 +153,7 @@ namespace projectGk3
         {
             if (radioButtonFlat.Checked)
             {
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, ConvolutionFilter.FlatenFilter, 0, -1);
-                pictureBox1.Image = PhotoAfter;
-                CreateHistograms(PhotoAfter);
+                Filter = ConvolutionFilter.FlatenFilter;
             }
         }
 
@@ -142,9 +161,7 @@ namespace projectGk3
         {
             if (radioButtonLaplace.Checked)
             {
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, ConvolutionFilter.LaplaceFilter, 0, -1);
-                pictureBox1.Image = PhotoAfter;
-                CreateHistograms(PhotoAfter);
+                Filter = ConvolutionFilter.LaplaceFilter;
             }
         }
 
@@ -152,9 +169,7 @@ namespace projectGk3
         {
             if (radioButtonIdentity.Checked)
             {
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(Photo, ConvolutionFilter.IdentityFilter, 0,-1);
-                pictureBox1.Image = PhotoAfter;
-                CreateHistograms(PhotoAfter);
+                Filter = ConvolutionFilter.IdentityFilter;
             }
         }
 
@@ -166,7 +181,7 @@ namespace projectGk3
             }
             else
             {
-                EnableOwn(false) ;
+                EnableOwn(false);
             }
         }
         public void EnableOwn(bool state)
@@ -181,19 +196,122 @@ namespace projectGk3
             numericUpDown12.Enabled = state;
             numericUpDown13.Enabled = state;
             checkBoxAutoDivisor.Enabled = state;
-            checkBoxAutoDivisor.Checked = true;
-            numericUpDownOffSet.Enabled = state;
+            //checkBoxAutoDivisor.Checked = true;
+            numericUpDownOffSet.Enabled = true;
         }
         private void checkBoxAutoDivisor_CheckedChanged(object sender, EventArgs e)
         {
-            if ( checkBoxAutoDivisor.Checked)
+            if (checkBoxAutoDivisor.Checked)
             {
+                numericUpDowndivisor.Value = 0;
                 numericUpDowndivisor.Enabled = false;
             }
             else
-               {
+            {
                 numericUpDowndivisor.Enabled = true;
             }
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            label3.Text = trackBar1.Value.ToString();
+        }
+        int mouseX;
+        int mouseY;
+        bool follow = false;
+        bool[,] brushColor;
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            isStill = false;
+            if (!isStill)
+            {
+                mouseX = e.X;
+                mouseY = e.Y;
+            }
+            if (follow)
+            {
+                int startX = Math.Max(0, mouseX - trackBar1.Value/2);
+                int endX = Math.Min(PhotoAfter.Width, mouseX + trackBar1.Value/2);
+
+                int startY = Math.Max(0, mouseY - trackBar1.Value/2);
+                int endY = Math.Min(PhotoAfter.Height, mouseY + trackBar1.Value/2);
+                int r2 = (trackBar1.Value / 2) * (trackBar1.Value / 2);
+                Parallel.For(startX, endX, x =>
+                {
+                    for (int y = startY; y < endY; y++)
+                    {
+                        if ((y-mouseY)*(y - mouseY) + (x - mouseX)* (x - mouseX) < r2)
+                        brushColor[x, y] = true;
+                    }
+                });
+            }
+            if (mouseX != null)
+            {
+                Bitmap bitmap = new Bitmap(PhotoAfter);
+                Graphics g = Graphics.FromImage(bitmap);
+                Pen blackPen = new Pen(Color.Black);
+                g.DrawEllipse(blackPen, mouseX - trackBar1.Value / 2, mouseY - trackBar1.Value / 2, trackBar1.Value, trackBar1.Value);
+                Pen whitePen = new Pen(Color.White);
+                g.DrawEllipse(whitePen, mouseX - trackBar1.Value / 2, mouseY - trackBar1.Value / 2, trackBar1.Value + 1, trackBar1.Value + 1);
+                pictureBox1.Image = bitmap;
+            }
+        }
+        private void Form1_Load_1(object sender, EventArgs e)
+        {
+            Photo = new Bitmap("..\\..\\..\\photo.jpg", true);
+            PhotoAfter = new Bitmap(Photo);
+            pictureBox1.Image = PhotoAfter;
+            brushColor = new bool[Photo.Width, Photo.Height];
+            CreateHistograms(Photo);
+            radioButtonIdentity.Checked = true;
+            radioButtonIdentity_CheckedChanged(sender, e);
+        }
+
+        private void radioButtonBrush_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonBrush.Checked)
+            {
+                trackBar1.Enabled = true;
+            }
+            else
+            {
+                trackBar1.Enabled = false;
+            }
+        }
+       
+        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if(radioButtonBrush.Checked)
+                follow = true;
+        }
+
+        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (radioButtonBrush.Checked)
+            {
+                if (radioButtonOwn.Checked)
+                {
+                    Filter = new float[,]
+                       {
+            { (float)numericUpDown11.Value, (float)numericUpDown12.Value, (float)numericUpDown13.Value},
+            { (float)numericUpDown21.Value, (float)numericUpDown22.Value, (float)numericUpDown23.Value},
+            { (float)numericUpDown31.Value, (float)numericUpDown32.Value, (float)numericUpDown33.Value}
+                       };
+                }
+                float divisor;
+                if (checkBoxAutoDivisor.Checked)
+                    divisor = 0;
+                else
+                    divisor = (float)numericUpDowndivisor.Value;
+                float offSet = (float)numericUpDownOffSet.Value;
+                follow = false;
+                
+                PhotoAfter = ConvolutionFilter.ProcessUsingLockbitsBoolMap(PhotoAfter, Filter, offSet, divisor,brushColor);
+                brushColor = new bool[Photo.Width, Photo.Height];
+                pictureBox1.Image = PhotoAfter;
+            CreateHistograms(PhotoAfter);
+        }
+
         }
     }
 }
