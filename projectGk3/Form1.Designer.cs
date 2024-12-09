@@ -175,6 +175,7 @@
             radioButtonFullImage.TabStop = true;
             radioButtonFullImage.Text = "Cały Obraz";
             radioButtonFullImage.UseVisualStyleBackColor = true;
+            radioButtonFullImage.CheckedChanged += radioButtonFullImage_CheckedChanged;
             // 
             // radioButtonBrush
             // 
@@ -216,7 +217,6 @@
             groupBoxFilter.TabIndex = 7;
             groupBoxFilter.TabStop = false;
             groupBoxFilter.Text = "Wybór Filtra Macierzowego";
-            groupBoxFilter.Enter += groupBox2_Enter;
             // 
             // checkBoxAutoDivisor
             // 
@@ -377,7 +377,6 @@
             numericUpDown11.Name = "numericUpDown11";
             numericUpDown11.Size = new Size(71, 23);
             numericUpDown11.TabIndex = 8;
-            numericUpDown11.ValueChanged += numericUpDown1_ValueChanged;
             // 
             // radioButtonOwn
             // 

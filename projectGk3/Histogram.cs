@@ -18,6 +18,7 @@ namespace projectGk3
             int[] tabG = new int[256];
             int[] tabB = new int[256];
             int  maxR = 0;
+
             for (int i = 0;i < bitmap.Width; i++)
             {
                 for (int j = 0; j < bitmap.Height; j++)

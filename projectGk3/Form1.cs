@@ -21,15 +21,6 @@ namespace projectGk3
             { (float)numericUpDown31.Value, (float)numericUpDown32.Value, (float)numericUpDown33.Value}
                };
         }
-        private void groupBox2_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -51,13 +42,7 @@ namespace projectGk3
             if (radioButtonFullImage.Checked)
             {
 
-                PhotoAfter = ConvolutionFilter.ProcessUsingLockbits(PhotoAfter, Filter, offSet, divisor);
-                // PhotoAfter = ConvolutionFilter.ApplyConvolutionFilter(PhotoAfter, Filter, offSet, divisor);
-            }
-            else if (radioButtonBrush.Checked)
-            {
-
-                PhotoAfter = ConvolutionFilter.ApplyConvolutionFilterCircle(PhotoAfter, Filter, offSet, divisor, mouseX, mouseY, trackBar1.Value / 2);
+                PhotoAfter = ConvolutionFilter.ApplyFilter(PhotoAfter, Filter, offSet, divisor);
             }
             pictureBox1.Image = PhotoAfter;
             CreateHistograms(PhotoAfter);
@@ -80,7 +65,7 @@ namespace projectGk3
                     Photo = new Bitmap(openFileDialog.FileName, true);
                 }
             }
-            PhotoAfter =new Bitmap(Photo);
+            PhotoAfter = new Bitmap(Photo);
             pictureBox1.Image = PhotoAfter;
             brushColor = new bool[Photo.Width, Photo.Height];
             CreateHistograms(PhotoAfter);
@@ -196,7 +181,6 @@ namespace projectGk3
             numericUpDown12.Enabled = state;
             numericUpDown13.Enabled = state;
             checkBoxAutoDivisor.Enabled = state;
-            //checkBoxAutoDivisor.Checked = true;
             numericUpDownOffSet.Enabled = true;
         }
         private void checkBoxAutoDivisor_CheckedChanged(object sender, EventArgs e)
@@ -222,30 +206,26 @@ namespace projectGk3
         bool[,] brushColor;
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            isStill = false;
-            if (!isStill)
-            {
-                mouseX = e.X;
-                mouseY = e.Y;
-            }
+            mouseX = e.X;
+            mouseY = e.Y;
             if (follow)
             {
-                int startX = Math.Max(0, mouseX - trackBar1.Value/2);
-                int endX = Math.Min(PhotoAfter.Width, mouseX + trackBar1.Value/2);
+                int startX = Math.Max(0, mouseX - trackBar1.Value / 2);
+                int endX = Math.Min(PhotoAfter.Width, mouseX + trackBar1.Value / 2);
 
-                int startY = Math.Max(0, mouseY - trackBar1.Value/2);
-                int endY = Math.Min(PhotoAfter.Height, mouseY + trackBar1.Value/2);
+                int startY = Math.Max(0, mouseY - trackBar1.Value / 2);
+                int endY = Math.Min(PhotoAfter.Height, mouseY + trackBar1.Value / 2);
                 int r2 = (trackBar1.Value / 2) * (trackBar1.Value / 2);
                 Parallel.For(startX, endX, x =>
                 {
                     for (int y = startY; y < endY; y++)
                     {
-                        if ((y-mouseY)*(y - mouseY) + (x - mouseX)* (x - mouseX) < r2)
-                        brushColor[x, y] = true;
+                        if ((y - mouseY) * (y - mouseY) + (x - mouseX) * (x - mouseX) < r2)
+                            brushColor[x, y] = true;
                     }
                 });
             }
-            if (mouseX != null)
+            if (mouseX != null && radioButtonBrush.Checked)
             {
                 Bitmap bitmap = new Bitmap(PhotoAfter);
                 Graphics g = Graphics.FromImage(bitmap);
@@ -265,6 +245,8 @@ namespace projectGk3
             CreateHistograms(Photo);
             radioButtonIdentity.Checked = true;
             radioButtonIdentity_CheckedChanged(sender, e);
+            button1.Enabled = radioButtonFullImage.Checked;
+            label3.Text = "1";
         }
 
         private void radioButtonBrush_CheckedChanged(object sender, EventArgs e)
@@ -278,10 +260,10 @@ namespace projectGk3
                 trackBar1.Enabled = false;
             }
         }
-       
+
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if(radioButtonBrush.Checked)
+            if (radioButtonBrush.Checked)
                 follow = true;
         }
 
@@ -305,13 +287,22 @@ namespace projectGk3
                     divisor = (float)numericUpDowndivisor.Value;
                 float offSet = (float)numericUpDownOffSet.Value;
                 follow = false;
-                
-                PhotoAfter = ConvolutionFilter.ProcessUsingLockbitsBoolMap(PhotoAfter, Filter, offSet, divisor,brushColor);
+
+                PhotoAfter = ConvolutionFilter.ApplyFliterArea(PhotoAfter, Filter, offSet, divisor, brushColor);
                 brushColor = new bool[Photo.Width, Photo.Height];
                 pictureBox1.Image = PhotoAfter;
-            CreateHistograms(PhotoAfter);
+                CreateHistograms(PhotoAfter);
+            }
+
         }
 
+        private void radioButtonFullImage_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonFullImage.Checked)
+            {
+                pictureBox1.Image = PhotoAfter;
+            }
+            button1.Enabled = radioButtonFullImage.Checked;
         }
     }
 }
